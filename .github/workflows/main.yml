@@ -56,3 +56,15 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository_owner }}/my-api:latest
             ghcr.io/${{ github.repository_owner }}/my-api:${{ github.sha }}
+- name: Send Telegram Notification
+        if: always()
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            🚀 *CI/CD Natijasi:*
+            👤 Kim: ${{ github.actor }}
+            📝 Commit: ${{ github.event.head_commit.message }}
+            📊 Holat: ${{ job.status == 'success' && '✅ Muvaffaqiyatli' || '❌ Xatolik yuz berdi' }}
+            🔗 Link: https://github.com/${{ github.repository }}/actions
