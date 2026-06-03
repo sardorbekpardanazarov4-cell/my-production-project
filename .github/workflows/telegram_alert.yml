@@ -1,0 +1,53 @@
+name: CI/CD Alert to Telegram
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Bu yerda sizning asosiy test yoki build jarayoningiz bo'ladi
+      - name: Run a one-line script
+        run: echo "Testing your application..."
+
+      # Masalan, xatolikni simulyatsiya qilish uchun buni yoqish mumkin:
+      # - name: Simulate failure
+      #   run: exit 1
+
+      # SUCCESS bo'lganda ishlaydigan xabar
+      - name: Telegram Success Notification
+        if: success()
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            ✅ GitHub Actions Muvaffaqiyatli Yakunlandi!
+            
+            Repozitoriya: ${{ github.repository }}
+            Commit: ${{ github.event.head_commit.message }}
+            Muallif: ${{ github.actor }}
+            
+            Barcha testlar muvaffaqiyatli o'tdi. 👍
+
+      # FAILURE (xatolik) bo'lganda ishlaydigan xabar
+      - name: Telegram Failure Notification
+        if: failure()
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            ❌ DIQQAT! GitHub Actions-da xatolik yuz berdi!
+            
+            Repozitoriya: ${{ github.repository }}
+            Branch: ${{ github.ref }}
+            Commit xabari: ${{ github.event.head_commit.message }}
+            
+            Iltimos, workflow loglarini tekshiring! ⚠️
